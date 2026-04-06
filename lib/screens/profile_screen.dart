@@ -23,17 +23,21 @@ class ProfileScreen extends StatelessWidget {
             child: CircleAvatar(
               radius: 60,
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Icon(Icons.person, size: 60, color: theme.colorScheme.primary),
+              child: Icon(
+                Icons.person,
+                size: 60,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 24),
           Text(
-            'John Doe',
+            'User Name',
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineMedium,
           ),
           Text(
-            'johndoe@example.com',
+            'user@example.com',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
@@ -42,7 +46,10 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 48),
           ListTile(
             leading: Icon(Icons.dark_mode, color: theme.colorScheme.secondary),
-            title: Text('Dark Mode', style: theme.textTheme.titleLarge?.copyWith(fontSize: 18)),
+            title: Text(
+              'Dark Mode',
+              style: theme.textTheme.titleLarge?.copyWith(fontSize: 18),
+            ),
             trailing: Switch(
               value: themeProvider.isDarkMode,
               onChanged: (value) {
@@ -50,14 +57,24 @@ class ProfileScreen extends StatelessWidget {
               },
               activeColor: theme.colorScheme.primary,
             ),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             tileColor: theme.colorScheme.surfaceContainerHighest,
           ),
           const SizedBox(height: 16),
           ListTile(
             leading: Icon(Icons.logout, color: theme.colorScheme.error),
-            title: Text('Log Out', style: theme.textTheme.titleLarge?.copyWith(fontSize: 18, color: theme.colorScheme.error)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: Text(
+              'Log Out',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontSize: 18,
+                color: theme.colorScheme.error,
+              ),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             tileColor: theme.colorScheme.surfaceContainerHighest,
             onTap: () {
               Navigator.of(context).pushAndRemoveUntil(

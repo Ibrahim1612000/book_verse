@@ -6,7 +6,8 @@ import '../models/book_model.dart';
 class ApiService {
   Future<List<BookModel>> searchBooks(String query, {int startIndex = 0, int maxResults = 20}) async {
     try {
-      final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.volumesEndpoint}?q=$query&startIndex=$startIndex&maxResults=$maxResults');
+      final apiKeyParam = ApiConstants.apiKey.isNotEmpty ? '&key=${ApiConstants.apiKey}' : '';
+      final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.volumesEndpoint}?q=$query&startIndex=$startIndex&maxResults=$maxResults$apiKeyParam');
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
@@ -16,6 +17,8 @@ class ApiService {
           return items.map((item) => BookModel.fromJson(item)).toList();
         }
         return [];
+      } else if (response.statusCode == 429) {
+        throw Exception('Rate limit exceeded (429). Please add a Google Books API key in `api_constants.dart` or try again later.');
       } else {
         throw Exception('Failed to load books: ${response.statusCode}');
       }
