@@ -1,9 +1,8 @@
 class ApiConstants {
-  static const String baseUrl =
-      'https://www.googleapis.com/books/v1/volumes?q=flutter';
-  static const String volumesEndpoint = 'volumes';
+  static const String baseUrl = 'https://openlibrary.org';
+  static const String searchEndpoint = '/search.json';
+  static const String booksEndpoint = '/api/books';
 
-  // NOTE: If you experience 429 errors (Too Many Requests), provide a Google Books API key here.
-  // Leave it empty to use the unauthenticated API limit (which is very strict).
+  // OpenLibrary API does not require an API key for its standard search endpoint.
   static const String apiKey = '';
 }

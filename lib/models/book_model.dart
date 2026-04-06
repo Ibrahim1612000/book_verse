@@ -20,37 +20,74 @@ class BookModel {
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
-    final volumeInfo = json['volumeInfo'] as Map<String, dynamic>? ?? {};
-    
-    // Parse authors
-    final authorsList = volumeInfo['authors'] as List<dynamic>? ?? [];
-    final List<String> parsedAuthors = authorsList.map((e) => e.toString()).toList();
+    // Open Library search.json format
+    final title = json['title']?.toString() ?? 'Unknown Title';
 
-    // Parse categories
-    final categoriesList = volumeInfo['categories'] as List<dynamic>? ?? [];
-    final List<String> parsedCategories = categoriesList.map((e) => e.toString()).toList();
-
-    // Parse image links
-    final imageLinks = volumeInfo['imageLinks'] as Map<String, dynamic>? ?? {};
-    String thumbnailUrl = imageLinks['thumbnail'] ?? imageLinks['smallThumbnail'] ?? '';
-    // Use https for images
-    if (thumbnailUrl.startsWith('http:')) {
-      thumbnailUrl = thumbnailUrl.replaceFirst('http:', 'https:');
+    // Parse authors - can be list of strings or list of author objects
+    List<String> parsedAuthors = [];
+    if (json['authors'] != null) {
+      final authorsList = json['authors'] as List;
+      parsedAuthors = authorsList.map((author) {
+        if (author is String) {
+          return author;
+        } else if (author is Map<String, dynamic> && author['name'] != null) {
+          return author['name'].toString();
+        }
+        return 'Unknown Author';
+      }).toList();
     }
 
-    // Parse rating
+    if (parsedAuthors.isEmpty) {
+      parsedAuthors = ['Unknown Author'];
+    }
+
+    // Parse description
+    String description = 'No description available.';
+    if (json['description'] != null) {
+      if (json['description'] is String) {
+        description = json['description'];
+      } else if (json['description'] is Map<String, dynamic>) {
+        description =
+            json['description']['value']?.toString() ??
+            'No description available.';
+      }
+    }
+
+    // Parse cover image
+    String thumbnailUrl = '';
+    if (json['cover_i'] != null) {
+      final coverId = json['cover_i'];
+      thumbnailUrl = 'https://covers.openlibrary.org/b/id/$coverId-L.jpg';
+    } else if (json['cover_edition_key'] != null) {
+      // Fallback: try to get cover by edition key (less reliable)
+      thumbnailUrl = '';
+    }
+
+    // Parse published date
+    String publishedDate = 'Unknown';
+    if (json['first_publish_year'] != null) {
+      publishedDate = json['first_publish_year'].toString();
+    } else if (json['publish_date'] != null) {
+      publishedDate = json['publish_date'].toString();
+    }
+
+    // Parse categories/subjects
+    List<String> parsedCategories = [];
+    if (json['subject'] != null) {
+      final subjectsList = json['subject'] as List;
+      parsedCategories = subjectsList.take(5).map((e) => e.toString()).toList();
+    }
+
+    // Open Library doesn't provide ratings in search results
     double parsedRating = 0.0;
-    if (volumeInfo['averageRating'] != null) {
-      parsedRating = (volumeInfo['averageRating'] as num).toDouble();
-    }
 
     return BookModel(
-      id: json['id'] ?? '',
-      title: volumeInfo['title'] ?? 'Unknown Title',
+      id: json['key']?.toString() ?? json['edition_key']?.toString() ?? '',
+      title: title,
       authors: parsedAuthors,
-      description: volumeInfo['description'] ?? 'No description available.',
+      description: description,
       thumbnail: thumbnailUrl,
-      publishedDate: volumeInfo['publishedDate'] ?? 'Unknown',
+      publishedDate: publishedDate,
       rating: parsedRating,
       categories: parsedCategories,
     );
@@ -66,10 +103,8 @@ class BookModel {
         'publishedDate': publishedDate,
         'averageRating': rating,
         'categories': categories,
-        'imageLinks': {
-          'thumbnail': thumbnail,
-        }
-      }
+        'imageLinks': {'thumbnail': thumbnail},
+      },
     };
   }
 }
